@@ -1,0 +1,7 @@
+user creates a challenge
+enter how many days it lasts,
+app creates a table with rows equal to number of days entered,
+user enters the habits to be tracked | each habit is added as a new row,
+everytime user user marks a cell as completed , cell marks it as green/checked or something similar
+user can view his progress across days/weeks/months
+add carousel with quotes, 
