@@ -29,7 +29,7 @@
     <ul class="navbar-nav">
 
       <li class="nav-item active">
-        <a class="nav-link nav-texts" href="#">Home <span class="sr-only">(current)</span></a>
+        <a class="nav-link nav-texts" href="{{ url_for('views.home') }}">Home <span class="sr-only">(current)</span></a>
       </li>
 
       <li class="nav-item">
@@ -101,6 +101,7 @@
 </div>
 
 
+<!--if table rendering request....-->
 {% if name %}
 
 <div class="my-table ">
@@ -118,7 +119,7 @@
                  </button>
             </td>
             {% for day in range(days) %}
-            <td style="background-color:#97adde;"> day-{{ day+1}} </td>
+            <td style="background-color:#97adde; text-align:center;"> Day-{{ day+1}} </td>
             {% endfor %}
           </tr>
 
@@ -128,6 +129,7 @@
           <tbody>
 
           {% for  habit in habits %}
+<!--           rows of habit -->
 
 <!--          first row -->
           <tr>
@@ -135,10 +137,14 @@
 
             {% for day in range(days) %}
             <td style="background-color:white;">
-                {% if day in done[habits.index(habit)] %}
+                {% if (day+1) in done[habits.index(habit)] %}
+<!--                if row completed -->
+                <a href="{{ url_for('views.undo', day=day+1, habit=habit) }}">
                     <button class="btn btn-block bg-success">
                          <i class="fa-solid fa-check-double"></i>
                     </button>
+                </a>
+
                 {% else %}
 <!--                  <a href="#">-->
                   <a href="{{ url_for('views.completed', day=day + 1, habit=habit) }}">
@@ -148,9 +154,9 @@
                  </a>
                 {% endif %}
 
-
             </td>
             {% endfor %}
+
           </tr>
 
           {% endfor %}
