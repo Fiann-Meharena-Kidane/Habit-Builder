@@ -1,0 +1,28 @@
+body{
+    background-color: #525252;
+}
+.centered-form{
+	margin-top: 60px;
+}
+
+.centered-form .panel{
+	background: rgba(255, 255, 255, 0.8);
+	box-shadow: rgba(0, 0, 0, 0.3) 20px 20px 20px;
+
+}
+
+.register-container{
+padding-top:5%;
+padding-right:10%;
+padding-bottom:17%;
+background-color:#f5e7ba;
+
+}
+
+.panel{
+	border-radius:15px;
+}
+
+.panel-heading{
+border-radius:15px;
+}
