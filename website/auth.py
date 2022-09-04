@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, redirect, request, flash, url_for
-from flask_login import login_required, current_user
+from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .models import *
@@ -25,6 +25,8 @@ def register():
             db.session.add(new_user)
             db.session.commit()
 
+            login_user(new_user)
+
             # return 'hello'
             return redirect(url_for('views.home'))
         else:
@@ -41,6 +43,7 @@ def login():
 
         if user:
             if check_password_hash(user.password,request.form.get('password')):
+                login_user(user)
                 return redirect(url_for('views.home'))
             else:
                 return 'wrong password'
@@ -49,3 +52,9 @@ def login():
 
     else:
         return render_template('login.html')
+
+
+@auth.route('/logout')
+def logout():
+    logout_user()
+    return render_template('login.html')
