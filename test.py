@@ -1,13 +1,12 @@
-demo='3|6|||5|4|'
+import requests
 
-print(demo.split('|'))
+response=requests.get('https://zenquotes.io/api/quotes')
+data=response.json()
 
-temp_list=[]
-
-for value in demo:
-    temp_list.append(value)
-
-print(temp_list)
+for entry in data:
+    quote=entry['q']
+    author=entry['a']
+    print(quote, author)
 
 
 
