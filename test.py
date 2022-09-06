@@ -1,15 +1,27 @@
-demo='3|6|5|4|'
+demo='3|6|||5|4|'
 
+print(demo.split('|'))
 
-dele='3'
-updated_data=''
+temp_list=[]
+
 for value in demo:
-    if not value==dele:
-        updated_data+=value
-    final_data=updated_data[1:]
+    temp_list.append(value)
+
+print(temp_list)
 
 
-print(final_data)
+
+
+
+
+
+
+
+
+
+
+
+# print(final_data)
 
 # print(updated_data.split('|')[:-1])
 

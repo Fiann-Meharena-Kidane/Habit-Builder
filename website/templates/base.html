@@ -155,11 +155,11 @@
           <tr>
             <td class="bg-#778bc7">{{ habit }}</td>
 
-            {% for day in range(days) %}
+            {% for day in range(1,days+1) %}
             <td style="background-color:white;">
-                {% if (day+1) in done[habits.index(habit)] %}
+                {% if day in done[habits.index(habit)] %}
 <!--                if row completed -->
-                <a href="{{ url_for('views.undo', day=day+1, habit=habit,challenge=name) }}">
+                <a href="{{ url_for('views.undo', day=day, habit=habit,challenge=name) }}">
                     <button class="btn btn-block bg-success">
                          <i class="fa-solid fa-check-double"></i>
                     </button>
@@ -167,7 +167,7 @@
 
                 {% else %}
 <!--                  <a href="#">-->
-                  <a href="{{ url_for('views.completed', day=day + 1, habit=habit , challenge=name) }}">
+                  <a href="{{ url_for('views.completed', day=day, habit=habit , challenge=name) }}">
                     <button class="btn btn-block bg-light">
                         <i class="fa-solid fa-circle-dot"></i>
                     </button>
