@@ -28,9 +28,11 @@ def register():
             login_user(new_user)
 
             # return 'hello'
+            flash(f"Welcome, {current_user.name}!")
             return redirect(url_for('views.home'))
         else:
-            return 'email exists, login'
+            flash(f"Email exists, login instead")
+            return redirect(url_for('auth.login'))
     else:
         return render_template('register.html')
 
@@ -44,11 +46,14 @@ def login():
         if user:
             if check_password_hash(user.password,request.form.get('password')):
                 login_user(user)
+                flash(f"Welcome, {current_user.name}!")
                 return redirect(url_for('views.home'))
             else:
-                return 'wrong password'
+                flash('Password Incorrect', category='error')
+                return redirect(url_for('auth.login'))
         else:
-            return 'email doesnt exist'
+            flash('Email does not exist, please register')
+            return redirect(url_for('auth.register'))
 
     else:
         return render_template('login.html')
@@ -57,4 +62,4 @@ def login():
 @auth.route('/logout')
 def logout():
     logout_user()
-    return render_template('login.html')
+    return redirect(url_for('auth.login'))

@@ -1,15 +1,25 @@
 
 .my-table{
-background-color:bisque;
+background-color:#97bee6;
 border-radius:5px;
-padding:5px;
+padding-bottom:5px;
+padding-left:10px;
+padding-right:10px;
+margin-top:0.5%;
 }
 
+.message-display-home{
+text-align:center;
+background-color:#a6f299;
+padding-top:7px;
+padding-bottom:5px;
+}
 
 .add-button{
 padding-left:270px;
 }
 
 .logout-button{
-
-padding-left:500px}
+color:red;
+padding-left:500px;
+}

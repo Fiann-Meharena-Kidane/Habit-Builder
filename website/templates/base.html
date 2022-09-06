@@ -66,7 +66,7 @@
       </li>
 
         <li class="nav-item logout-button">
-          <a href="{{ url_for('auth.logout') }}">
+          <a  style="color:red;" href="{{ url_for('auth.logout') }}">
             <i class="fa-solid fa-arrow-right-from-bracket fa-2xl"></i>
           </a>
         </li>
@@ -75,7 +75,6 @@
 
   </div>
 </nav>
-
 
 
 <!-- Modal to add Challenge -->
@@ -112,6 +111,19 @@
   </div>
 </div>
 
+
+			{% with messages = get_flashed_messages() %}
+				  {% if messages %}
+
+						{% for message in messages %}
+                        <div class="message-display-home">
+                        <p  style="color:green" class="text-center">{{ message }}</p>
+                          </div>
+						{% endfor %}
+
+			{% endif %}
+			{% endwith %}
+{% include "quotes.html" %}
 
 <!--if table rendering request....-->
 {% if name %}

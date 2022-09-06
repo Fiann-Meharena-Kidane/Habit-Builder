@@ -2,6 +2,8 @@
 <head>
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.1.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link rel="stylesheet" href="{{ url_for('static', filename='styles/register.css') }}">
+	<link rel="icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
+
 	<title>Login</title>
 </head>
 
@@ -9,15 +11,32 @@
 <body>
 
 
+
 <div style="width:100%;" class="container register-container">
+
+			{% with messages = get_flashed_messages() %}
+				  {% if messages %}
+					<ul class=flashes>
+						{% for message in messages %}
+
+							<p class="alert alert-danger text-center" role="alert">{{ message }}</p>
+
+						{% endfor %}
+						</ul>
+			{% endif %}
+			{% endwith %}
         <div class="row centered-form">
         <div class="col-xs-12 col-sm-8 col-md-5 col-sm-offset-2 col-md-offset-4">
         	<div class="panel panel-default">
-        		<div class="panel-heading">
+        				<div class="panel-heading">
 
 			    		<h3 class="panel-title text-center">Log In</h3>
+
 			 			</div>
 			 			<div class="panel-body">
+
+
+
 			    		<form role="form" action="{{url_for('auth.login')}}" method="post">
 
 			    			<div class="form-group">
@@ -45,7 +64,6 @@
     		</div>
     	</div>
     </div>
-
 
 
 

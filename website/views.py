@@ -1,3 +1,4 @@
+import requests
 from flask import Blueprint, render_template, redirect, request, flash, url_for
 from flask_login import login_required, current_user, login_user, logout_user
 from . import db
@@ -10,6 +11,8 @@ views = Blueprint('views', __name__)
 @views.route('/home')
 @login_required
 def home():
+    response = requests.get('https://zenquotes.io/api/quotes')
+    quotes = response.json()
     try:
         # challenge = Challenge.query.all()[0]
         challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
@@ -46,11 +49,16 @@ def home():
                            days=days,
                            habits=habits,
                            done=list_of_completed,
-                           challenges=all_challenges)
+                           challenges=all_challenges,
+                           quotes=quotes)
 
 
 @views.route('/show-challenge/<challenge>', methods=['POST', 'GET'])
+@login_required
 def show_challenge(challenge):
+    response = requests.get('https://zenquotes.io/api/quotes')
+    quotes = response.json()
+
     # details about challenge, habit and completed ones
     target_challenge = Challenge.query.filter_by(name=challenge).first()
     print(target_challenge.name)
@@ -60,9 +68,6 @@ def show_challenge(challenge):
     print(all_challenges)
     list_of_completed = [habit.completed.split('|')[:-1] for habit in
                          Habits.query.filter_by(challenge_id=target_challenge.id)]
-    # print(list_of_completed)
-
-    # return 'hello'
 
     for element in list_of_completed:
         for i in range(len(element)):
@@ -76,7 +81,8 @@ def show_challenge(challenge):
                            days=int(target_challenge.days),
                            habits=habits,
                            done=list_of_completed,
-                           challenges=all_challenges)
+                           challenges=all_challenges,
+                           quotes=quotes)
     # render the requested challenge,
 
 
