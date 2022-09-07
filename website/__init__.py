@@ -7,7 +7,6 @@ db = SQLAlchemy()
 DB_NAME = 'challenges.db'
 
 
-
 def create_app():
     app = Flask(__name__)
     app.config['SECRET_KEY'] = 'secret'
