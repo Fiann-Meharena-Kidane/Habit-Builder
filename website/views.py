@@ -1,3 +1,4 @@
+import flask_login
 import requests
 from flask import Blueprint, render_template, redirect, request, flash, url_for
 from flask_login import login_required, current_user, login_user, logout_user
@@ -11,8 +12,7 @@ views = Blueprint('views', __name__)
 @views.route('/home')
 @login_required
 def home():
-    response = requests.get('https://zenquotes.io/api/quotes')
-    quotes = response.json()
+    quotes=Quotes.query.all()
     try:
         # challenge = Challenge.query.all()[0]
         challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
@@ -56,9 +56,7 @@ def home():
 @views.route('/show-challenge/<challenge>', methods=['POST', 'GET'])
 @login_required
 def show_challenge(challenge):
-    response = requests.get('https://zenquotes.io/api/quotes')
-    quotes = response.json()
-
+    quotes = Quotes.query.all()
     # details about challenge, habit and completed ones
     target_challenge = Challenge.query.filter_by(name=challenge).first()
     print(target_challenge.name)
@@ -143,11 +141,11 @@ def undo(habit, day, challenge):
     day = str(day)
     habit = Habits.query.filter_by(name=habit).first()
 
-    current_completed=habit.completed
-    final_completed=current_completed.replace(f"{day}|", '')
+    current_completed = habit.completed
+    final_completed = current_completed.replace(f"{day}|", '')
     # replace/ remove day value
 
-    habit.completed=final_completed
+    habit.completed = final_completed
     db.session.commit()
 
     return redirect(url_for('views.show_challenge', challenge=challenge))
@@ -161,3 +159,24 @@ def delete_challenge(challenge):
     db.session.commit()
 
     return redirect(url_for('views.home'))
+
+
+@views.route('/fill')
+def fill():
+    response = requests.get('https://zenquotes.io/api/quotes')
+    quotes = response.json()
+
+    if not Quotes.query.all():
+        for entry in quotes:
+            quote = entry['q']
+            author = entry['a']
+
+            new_quote = Quotes(
+                quote=quote,
+                author=author
+            )
+
+            db.session.add(new_quote)
+            db.session.commit()
+
+    return f"DB Population Successful!"

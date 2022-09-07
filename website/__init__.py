@@ -1,9 +1,11 @@
+import requests
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from os import path
 from flask_login import LoginManager, login_manager
 db = SQLAlchemy()
 DB_NAME = 'challenges.db'
+
 
 
 def create_app():
@@ -15,13 +17,13 @@ def create_app():
 
     from .views import views
     from .auth import auth
-    from .models import User
+    from .models import User, Quotes
 
     app.register_blueprint(views, url_prefix='/')
     app.register_blueprint(auth, url_prefix='/')
 
     login_manager=LoginManager()
-    login_manager.login_view='view.login'
+    login_manager.login_view='views.home'
     login_manager.init_app(app)
 
     @login_manager.user_loader
