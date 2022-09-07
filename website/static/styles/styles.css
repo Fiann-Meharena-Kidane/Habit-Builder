@@ -23,3 +23,17 @@ padding-left:270px;
 color:red;
 padding-left:500px;
 }
+
+.footer{
+background-color:none;
+width:108%;
+
+}
+.fa-brands-base{
+padding:5px;
+}
+
+.base-links:hover{
+text-decoration:none;
+}
+

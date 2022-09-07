@@ -3,12 +3,15 @@ from flask_login import login_required, current_user, login_user, logout_user
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from .models import *
+import datetime
 
+now=datetime.datetime.now()
 auth = Blueprint('auth', __name__)
 
 
 @auth.route('/register', methods=['POST', 'GET'])
 def register():
+    year=now.year
     if request.method == 'POST':
         name = request.form.get('name')
         email = request.form.get('email')
@@ -32,13 +35,14 @@ def register():
             return redirect(url_for('views.home'))
         else:
             flash(f"Email exists, login instead")
-            return redirect(url_for('auth.login'))
+            return render_template('auth.login', year=year)
     else:
-        return render_template('register.html')
+        return render_template('register.html', year=year)
 
 
 @auth.route('/', methods=['POST','GET'])
 def login():
+    year=now.year
     if request.method=='POST':
         email=request.form.get('email')
         user=User.query.filter_by(email=email).first()
@@ -56,7 +60,7 @@ def login():
             return redirect(url_for('auth.register'))
 
     else:
-        return render_template('login.html')
+        return render_template('login.html', year=year)
 
 
 @auth.route('/logout')

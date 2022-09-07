@@ -1,16 +1,7 @@
-import requests
+import datetime
 
-response=requests.get('https://zenquotes.io/api/quotes')
-data=response.json()
-
-for entry in data:
-    quote=entry['q']
-    author=entry['a']
-    print(quote, author)
-
-
-
-
+now=datetime.datetime.now()
+print(now.year)
 
 
 

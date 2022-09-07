@@ -3,7 +3,8 @@ import requests
 from flask import Blueprint, render_template, redirect, request, flash, url_for
 from flask_login import login_required, current_user, login_user, logout_user
 from . import db
-
+import datetime
+now=datetime.datetime.now()
 from .models import *
 
 views = Blueprint('views', __name__)
@@ -13,6 +14,7 @@ views = Blueprint('views', __name__)
 @login_required
 def home():
     quotes=Quotes.query.all()
+    year=now.year
     try:
         # challenge = Challenge.query.all()[0]
         challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
@@ -50,13 +52,15 @@ def home():
                            habits=habits,
                            done=list_of_completed,
                            challenges=all_challenges,
-                           quotes=quotes)
+                           quotes=quotes,
+                           year=year)
 
 
 @views.route('/show-challenge/<challenge>', methods=['POST', 'GET'])
 @login_required
 def show_challenge(challenge):
     quotes = Quotes.query.all()
+    year=now.year
     # details about challenge, habit and completed ones
     target_challenge = Challenge.query.filter_by(name=challenge).first()
     print(target_challenge.name)
@@ -80,7 +84,8 @@ def show_challenge(challenge):
                            habits=habits,
                            done=list_of_completed,
                            challenges=all_challenges,
-                           quotes=quotes)
+                           quotes=quotes,
+                           year=year)
     # render the requested challenge,
 
 
@@ -159,6 +164,22 @@ def delete_challenge(challenge):
     db.session.commit()
 
     return redirect(url_for('views.home'))
+
+@views.route('/<habit>/<challenge>')
+def delete_habit(habit, challenge):
+    target_challenge=Challenge.query.filter_by(name=challenge).first()
+    all_habits=target_challenge.habits
+    # list of habits under the challenge on target,
+
+    for entry in all_habits:
+        if entry.name==habit:
+            # find the habit in the challenge , and delete it,
+            target_habit=Habits.query.filter_by(name=entry.name).first()
+            db.session.delete(target_habit)
+            db.session.commit()
+            return redirect(url_for('views.show_challenge', challenge=challenge))
+
+    # for habit in all_habits:
 
 
 @views.route('/fill')
