@@ -1,30 +1,22 @@
-import datetime
+from quickchart import QuickChart
 
-now=datetime.datetime.now()
-print(now.year)
+qc = QuickChart()
+# qc.width = 200
+# qc.height = 150
 
-
-
-
-
+# Config can be set as a string or as a nested dict
 
 
+config_1="""{type: 'radialGauge',data: { datasets: [{ data: [ """
 
+config_2="""], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
+  options: { // See https://github.com/pandameister/chartjs-chart-radial-gauge#options    domain: [0, 100],
+    trackColor: '#f0f8ff', centerPercentage: 90, centerArea: {  text: (val) => val + '%', },}
+}"""
 
-# print(final_data)
+number='45'
+qc.config = f"{config_1}{number}{config_2}"
 
-# print(updated_data.split('|')[:-1])
-
-
-# for i in updated_data.split('|')[:-1]:
-#     if not i=='':
-#         print(int(i))
-# result=['2', '2', '3', '4']
-
-#
-# list=['3','4','5']
-#
-# for x in range(len(list)):
-#     list[x]=int(list[x])
-#
-# print(list)
+image_url=qc.get_url()
+# You can get the chart URL...
+print(image_url)

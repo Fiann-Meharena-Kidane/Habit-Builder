@@ -146,8 +146,8 @@
           </tr>
 
           <tr>
-            <td class="bg-success">
-                <button type="button" class="btn btn-success btn-block" data-bs-toggle="modal" data-bs-target="#exampleModal1">
+            <td class="bg-success text-center">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#exampleModal1">
                     Habit +
                  </button>
             </td>
@@ -167,13 +167,20 @@
 <!--          first row -->
           <tr>
             <td class="bg-#778bc7">
-                <button class="btn btn-danger">
-                    <a href="{{ url_for('views.delete_habit', habit=habit, challenge=name) }}">
-                        <i class="fa-solid fa-circle-minus"></i>
-                    </a>
-                </button> -
 
-                {{ habit }}
+                <a style="text-decoration:none; color:red;" href="{{ url_for('views.delete_habit', habit=habit, challenge=name) }}">
+                    <i class="fa-solid fa-circle-minus fa-2xl"></i>
+                </a>
+
+
+                <img style="border-radius:10px;"
+                     src="{{ images[habits.index(habit)] }}"
+                     alt=""
+                     width="60px"
+                     height="40px;"
+                      >
+
+            -- {{ habit }}
 
             </td>
 
@@ -203,6 +210,13 @@
 
           {% endfor %}
 
+          <tr class="bg-primary" style="text-align:center; border:none;">
+              <td  colspan="{{ days+1 }}">
+                  <button class="btn btn-primary btn-block">
+                      Statistics
+                  </button>
+              </td>
+          </tr>
 
           </tbody>
     </table>

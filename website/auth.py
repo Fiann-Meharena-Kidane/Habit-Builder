@@ -49,7 +49,7 @@ def login():
 
         if user:
             if check_password_hash(user.password,request.form.get('password')):
-                login_user(user)
+                login_user(user, remember=False)
                 flash(f"Welcome, {current_user.name}!")
                 return redirect(url_for('views.home'))
             else:
@@ -64,6 +64,7 @@ def login():
 
 
 @auth.route('/logout')
+@login_required
 def logout():
     logout_user()
     return redirect(url_for('auth.login'))

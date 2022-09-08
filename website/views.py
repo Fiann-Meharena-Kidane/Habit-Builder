@@ -6,6 +6,11 @@ from . import db
 import datetime
 now=datetime.datetime.now()
 from .models import *
+from quickchart import QuickChart
+
+qc = QuickChart()
+# qc.width = 200
+# qc.height = 150
 
 views = Blueprint('views', __name__)
 
@@ -13,47 +18,65 @@ views = Blueprint('views', __name__)
 @views.route('/home')
 @login_required
 def home():
-    quotes=Quotes.query.all()
-    year=now.year
-    try:
-        # challenge = Challenge.query.all()[0]
-        challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
-    except IndexError:
-        return render_template('base.html')
-        # if no challenge found render base,
+    if current_user.is_authenticated:
+        quotes=Quotes.query.all()
+        year=now.year
+        try:
+            # challenge = Challenge.query.all()[0]
+            challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
+        except IndexError:
+            return render_template('base.html')
+            # if no challenge found render base,
+        else:
+            challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
+
+        challenge_name = challenge.name
+        days = int(challenge.days)
+        habits = [habit.name for habit in challenge.habits]
+        # get all habits for this specific challenge,
+        all_challenges = Challenge.query.filter_by(user_id=current_user.id).all()
+        # to be displayed on the drop-down menu,
+
+        # gets challenge name, number of days, and list of habit names
+
+        list_of_completed = [habit.completed.split('|')[:-1] for habit in Habits.query.filter_by(challenge_id=challenge.id)]
+        # list_of_completed = [habit.completed.split('|')[:-1] for habit in habits]
+        # list of completed days/ marked as done /
+
+        for element in list_of_completed:
+            for i in range(len(element)):
+                if not (element[i] == '' or element[i] == '|'):
+                    element[i] = int(element[i])
+        # make sure list of completed is does not contain elements other than int values
+
+        print(list_of_completed)
+
+        list_of_guages=[int(len(habit)/7*100) for habit in list_of_completed]
+        config_1 = """{type: 'radialGauge',data: { datasets: [{ data: [ """
+        config_2 = """], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
+          options: { // See https://github.com/pandameister/chartjs-chart-radial-gauge#options    domain: [0, 100],
+            trackColor: '#f0f8ff', centerPercentage: 90, centerArea: {  text: (val) => val + '%', },}
+        }"""
+        number = '0'
+        list_of_images=[]
+        for gauge in list_of_guages:
+            number=gauge
+            qc.config = f"{config_1}{number}{config_2}"
+            image_url = qc.get_url()
+            list_of_images.append(image_url)
+
+        return render_template('base.html',
+                               current_user=current_user,
+                               name=challenge_name,
+                               days=days,
+                               habits=habits,
+                               done=list_of_completed,
+                               challenges=all_challenges,
+                               quotes=quotes,
+                               year=year,
+                               images=list_of_images)
     else:
-        challenge = Challenge.query.filter_by(user_id=current_user.id)[0]
-
-    challenge_name = challenge.name
-    days = int(challenge.days)
-    habits = [habit.name for habit in challenge.habits]
-    # get all habits for this specific challenge,
-    all_challenges = Challenge.query.filter_by(user_id=current_user.id).all()
-    # to be displayed on the drop-down menu,
-
-    # gets challenge name, number of days, and list of habit names
-
-    list_of_completed = [habit.completed.split('|')[:-1] for habit in Habits.query.filter_by(challenge_id=challenge.id)]
-    # list_of_completed = [habit.completed.split('|')[:-1] for habit in habits]
-    # list of completed days/ marked as done /
-
-    for element in list_of_completed:
-        for i in range(len(element)):
-            if not (element[i] == '' or element[i] == '|'):
-                element[i] = int(element[i])
-    # make sure list of completed is does not contain elements other than int values
-
-    print(list_of_completed)
-
-    return render_template('base.html',
-                           current_user=current_user,
-                           name=challenge_name,
-                           days=days,
-                           habits=habits,
-                           done=list_of_completed,
-                           challenges=all_challenges,
-                           quotes=quotes,
-                           year=year)
+        return 'not logged in'
 
 
 @views.route('/show-challenge/<challenge>', methods=['POST', 'GET'])
@@ -77,6 +100,20 @@ def show_challenge(challenge):
                 element[i] = int(element[i])
     print(list_of_completed)
 
+    list_of_guages = [int(len(habit) / 7 * 100) for habit in list_of_completed]
+    config_1 = """{type: 'radialGauge',data: { datasets: [{ data: [ """
+    config_2 = """], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
+      options: { // See https://github.com/pandameister/chartjs-chart-radial-gauge#options    domain: [0, 100],
+        trackColor: '#f0f8ff', centerPercentage: 90, centerArea: {  text: (val) => val + '%', },}
+    }"""
+    number = '0'
+    list_of_images = []
+    for gauge in list_of_guages:
+        number = gauge
+        qc.config = f"{config_1}{number}{config_2}"
+        image_url = qc.get_url()
+        list_of_images.append(image_url)
+
     return render_template('base.html',
                            current_user=current_user,
                            name=target_challenge.name,
@@ -85,7 +122,8 @@ def show_challenge(challenge):
                            done=list_of_completed,
                            challenges=all_challenges,
                            quotes=quotes,
-                           year=year)
+                           year=year,
+                           images=list_of_images)
     # render the requested challenge,
 
 
@@ -164,6 +202,7 @@ def delete_challenge(challenge):
     db.session.commit()
 
     return redirect(url_for('views.home'))
+
 
 @views.route('/<habit>/<challenge>')
 def delete_habit(habit, challenge):
