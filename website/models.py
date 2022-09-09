@@ -27,6 +27,7 @@ class Habits(db.Model, UserMixin):
     id = db.Column(Integer, primary_key=True)
     name = db.Column(String)
     completed = db.Column(Integer)
+    percentile=db.Column(Integer)
     challenge_id = db.Column(Integer, ForeignKey('challenge.id'))
 
     # challenge_id is used to refer a given habit,

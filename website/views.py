@@ -2,11 +2,11 @@ import flask_login
 import requests
 from flask import Blueprint, render_template, redirect, request, flash, url_for
 from flask_login import login_required, current_user, login_user, logout_user
-from . import db
 import datetime
 now=datetime.datetime.now()
 from .models import *
 from quickchart import QuickChart
+
 
 qc = QuickChart()
 # qc.width = 200
@@ -65,6 +65,7 @@ def home():
             image_url = qc.get_url()
             list_of_images.append(image_url)
 
+
         return render_template('base.html',
                                current_user=current_user,
                                name=challenge_name,
@@ -86,7 +87,8 @@ def show_challenge(challenge):
     year=now.year
     # details about challenge, habit and completed ones
     target_challenge = Challenge.query.filter_by(name=challenge).first()
-    print(target_challenge.name)
+    # print(target_challenge.name)
+
     habits = [habit.name for habit in target_challenge.habits]
     print(habits)
     all_challenges = Challenge.query.filter_by(user_id=current_user.id).all()
@@ -100,7 +102,9 @@ def show_challenge(challenge):
                 element[i] = int(element[i])
     print(list_of_completed)
 
-    list_of_guages = [int(len(habit) / 7 * 100) for habit in list_of_completed]
+    # API call to draw a gauge chart
+
+    list_of_gauges = [int(len(habit) / target_challenge.days * 100) for habit in list_of_completed]
     config_1 = """{type: 'radialGauge',data: { datasets: [{ data: [ """
     config_2 = """], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
       options: { // See https://github.com/pandameister/chartjs-chart-radial-gauge#options    domain: [0, 100],
@@ -108,11 +112,12 @@ def show_challenge(challenge):
     }"""
     number = '0'
     list_of_images = []
-    for gauge in list_of_guages:
+    for gauge in list_of_gauges:
         number = gauge
         qc.config = f"{config_1}{number}{config_2}"
         image_url = qc.get_url()
         list_of_images.append(image_url)
+    # creates list of gauges
 
     return render_template('base.html',
                            current_user=current_user,
@@ -131,7 +136,7 @@ def show_challenge(challenge):
 def create_challenge():
     # get name and days | create data entry | add entry
     name = request.form.get('name')
-    days = int(request.form.get('days'))
+    days = 7
 
     new_challenge = Challenge(
         name=name,
@@ -219,6 +224,52 @@ def delete_habit(habit, challenge):
             return redirect(url_for('views.show_challenge', challenge=challenge))
 
     # for habit in all_habits:
+
+
+@views.route('/stat/<challenge>')
+def stat(challenge):
+    target_challenge=Challenge.query.filter_by(name=challenge).first()
+    days=target_challenge.days
+    habit_objects=target_challenge.habits
+    habits=[habit.name for habit in habit_objects]
+    completed_ones=[entry.completed.split('|')[:-1] for entry in habit_objects]
+
+    efficiency=[] # holds list of percentiles
+
+    for value in range(1,11):  # calculates the the rate of completion in each day,
+        count=0
+        for entry in completed_ones:
+            if str(value) in entry:
+                count+=1
+        efficiency.append(count)
+
+    gauges=[int(len(data)/days*100)for data in completed_ones]
+    days_low=[f"DAY - {day}" for day in range(1, days+1)]
+
+    bar_chart=QuickChart()
+
+    # draw bar chart,
+    configure = {
+        'type': 'bar',
+        'data':
+            {
+                'labels': days_low,
+                'datasets': [
+
+        {
+            'label': 'Efficiency',
+            'data':efficiency,
+            'backgroundColor': '#37ed7d'
+        }
+
+    ]
+
+            }
+    }
+    bar_chart.config=configure
+    image_source=bar_chart.get_short_url()
+
+    return render_template('base.html', challenge=challenge, image_source=image_source)
 
 
 @views.route('/fill')
