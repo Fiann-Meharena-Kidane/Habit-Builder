@@ -1,5 +1,4 @@
 from website import create_app, db
-import requests
 
 app=create_app()
 

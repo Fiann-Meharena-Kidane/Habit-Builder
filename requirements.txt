@@ -1,3 +1,4 @@
+quickchart.io==1.0.1
 appdirs==1.4.4
 async-generator==1.10
 async-timeout==4.0.2
