@@ -9,8 +9,7 @@ from quickchart import QuickChart
 
 
 qc = QuickChart()
-# qc.width = 200
-# qc.height = 150
+# chart object
 
 views = Blueprint('views', __name__)
 
@@ -51,6 +50,7 @@ def home():
 
         print(list_of_completed)
 
+        # config command to construct the chart
         list_of_guages=[int(len(habit)/7*100) for habit in list_of_completed]
         config_1 = """{type: 'radialGauge',data: { datasets: [{ data: [ """
         config_2 = """], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
@@ -64,7 +64,7 @@ def home():
             qc.config = f"{config_1}{number}{config_2}"
             image_url = qc.get_url()
             list_of_images.append(image_url)
-
+        # create list of image urls to passed on to home-function
 
         return render_template('base.html',
                                current_user=current_user,
@@ -90,26 +90,28 @@ def show_challenge(challenge):
     # print(target_challenge.name)
 
     habits = [habit.name for habit in target_challenge.habits]
-    print(habits)
     all_challenges = Challenge.query.filter_by(user_id=current_user.id).all()
-    print(all_challenges)
     list_of_completed = [habit.completed.split('|')[:-1] for habit in
                          Habits.query.filter_by(challenge_id=target_challenge.id)]
+    # get all habits in target challenge, get all challenges that belong to the current user,
+    # and also fetch all list of completed data
 
     for element in list_of_completed:
         for i in range(len(element)):
             if not (element[i] == '' or element[i] == '|'):
                 element[i] = int(element[i])
-    print(list_of_completed)
+    # clear list of completed,
 
     # API call to draw a gauge chart
 
+    # config command
     list_of_gauges = [int(len(habit) / target_challenge.days * 100) for habit in list_of_completed]
     config_1 = """{type: 'radialGauge',data: { datasets: [{ data: [ """
     config_2 = """], backgroundColor: getGradientFillHelper('horizontal', ['red', 'blue']),  }]  },
       options: { // See https://github.com/pandameister/chartjs-chart-radial-gauge#options    domain: [0, 100],
         trackColor: '#f0f8ff', centerPercentage: 90, centerArea: {  text: (val) => val + '%', },}
     }"""
+
     number = '0'
     list_of_images = []
     for gauge in list_of_gauges:
@@ -137,6 +139,7 @@ def create_challenge():
     # get name and days | create data entry | add entry
     name = request.form.get('name')
     days = 7
+    # number of days set to 7 (fixed)
 
     new_challenge = Challenge(
         name=name,
@@ -175,7 +178,7 @@ def completed(day, habit, challenge):
     current_completed = habit.completed
     if not str(day) in current_completed:
         current_completed += f"{day}|"
-        # add a marker
+        # add a 'completed' marker
 
     habit.completed = current_completed
     db.session.commit()
@@ -234,9 +237,11 @@ def stat(challenge):
     habits=[habit.name for habit in habit_objects]
     completed_ones=[entry.completed.split('|')[:-1] for entry in habit_objects]
 
-    efficiency=[] # holds list of percentiles
+    efficiency=[]
+    # holds list of percentiles
 
-    for value in range(1,11):  # calculates the the rate of completion in each day,
+    for value in range(1,11):
+        # calculates the the rate of completion in each day,
         count=0
         for entry in completed_ones:
             if str(value) in entry:
